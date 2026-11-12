@@ -104,7 +104,10 @@ plt.show()
 Aim: Generate a sinusoid, sample it, quantize it, binary encode it, and plot SQNR vs. bits per sample.
 1) Generate the analog signal
 Use a very high time resolution to mimic a continuous signal.
-Logic: x(t) = A·sin(2πft) + offset
+Logic and code, choose one: x(t) = A·sin(2πft) + offset
+Square: x = A*np.sign(np.sin(2*np.pi*f*t)) + offset
+Triangular: x = A*(2/np.pi)*np.arcsin(np.sin(2*np.pi*f*t)) + offset
+Two sinusoids: x = A*np.sin(2*np.pi*f*t) + (A/2)*np.sin(2*np.pi*3*f*t) + offset
 Code: t = np.arange(0, 1, 1/fs), x = A*np.sin(2*np.pi*f*t) + offset
 Parameters: A = 2, f = 5 Hz, offset = 2, fs = 1000 Hz. The offset keeps the signal positive (0 to 4 V).
 2) Sample the analog signal

@@ -93,3 +93,60 @@ for i, (alpha, snr_db) in enumerate(all_scenarios):
     ax.grid(True)
 
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+1) Generate the bits and map them to symbols
+Code: bits = np.random.randint(0, 2, N_bits), symbols = np.where(bits == 0, 1, -1)
+Parameters: N_bits = 2000, L = 4, N_sym = 8.
+2) Upsample the symbols
+upsampled[::L] = symbols
+3) Generate the SRRC pulse
+Use the same SRRC formula as Experiment 3, with roll-off α.
+4) Pulse-shape the signal
+s = np.convolve(upsampled, p, mode='full')
+5) Add AWGN noise
+noise = np.sqrt(np.mean(s**2)/snr_lin) * np.random.randn(len(s)), r = s + noise
+6) Matched filter
+y = np.convolve(r, p[::-1], mode='full')
+7) Slice the output into overlapping traces
+Start index: start_idx = len(p) - 1 (the filter delay).
+Each trace has nSamples = 3*L points.
+Take nTraces = 100 traces, shifting the start by L samples each time: y[idx : idx + nSamples]
+8) Plot the eye diagram
+Plot all traces on the same axes with alpha = 0.3 transparency, so overlapping lines build up the eye.
+Run 6 scenarios:
+Effect of SNR: α = 0.4 with SNR = 0, 4, 8 dB.
+Effect of roll-off: SNR = 4 dB with α = 0.1, 0.5, 0.9.
+
+Expected result:
+
+Higher SNR gives a wider, clearer eye opening.
+Lower SNR makes the traces spread out and the eye closes.
+A small α gives a narrow eye that is sensitive to timing errors.
+A large α gives a wider horizontal eye opening and less ISI at the sampling instant.
+"""

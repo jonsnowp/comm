@@ -90,3 +90,32 @@ axs[2].legend()
 
 plt.tight_layout()
 plt.show()
+
+
+"""
+1) Generate the random bits
+Logic: equally likely 0s and 1s.
+Code: bits = np.random.randint(0, 2, N_bits)
+Parameters: N_bits = 100000, Eb = 1, Eb/N0 from −2 to 10 dB.
+2) Map bits to BPSK symbols
+Logic: 0 → +√Eb, 1 → −√Eb.
+Code: s = np.where(bits == 0, np.sqrt(Eb), -np.sqrt(Eb))
+Plot the ideal constellation: two points on the I axis.
+3) Add AWGN noise (for each Eb/N0 value)
+Convert dB to linear: snr_lin = 10**(snr_db/10)
+Noise density: N0 = Eb/snr_lin
+Noise standard deviation per dimension: sigma = sqrt(N0/2)
+Code: y = s + sigma*(np.random.randn(N_bits) + 1j*np.random.randn(N_bits))
+4) Detect the received symbols
+Logic: decision threshold at 0 on the real part.
+Code: detected_bits = np.where(np.real(y) >= 0, 0, 1)
+5) Compute the simulated BER
+errors = np.sum(bits != detected_bits), then BER = errors/N_bits
+6) Compute the theoretical BER
+Pb = 0.5 * erfc(np.sqrt(Eb/N0)), which is the same as Q(√(2Eb/N0)).
+7) Plot the results
+Plot the received constellation at 5 dB (noisy cloud around the two ideal points).
+Plot BER vs. Eb/N0 on a log y-axis (semilogy), simulated against theoretical.
+
+Expected result: The received points scatter around ±√Eb. As Eb/N0 increases, BER falls rapidly, and the simulated curve matches the theoretical one.
+"""

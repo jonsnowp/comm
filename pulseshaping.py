@@ -155,3 +155,63 @@ axs2_flat[5].legend()
 axs2_flat[5].grid(True, which='both', ls='--')
 
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+1) Generate the bits and map them to symbols
+Code: bits = np.random.randint(0, 2, N_bits), symbols = np.where(bits == 0, 1, -1)
+Parameters: N_bits = 50000, oversampling factor L = 4, pulse span N_sym = 8, roll-off β = 0.4.
+2) Upsample the symbols
+Logic: insert L−1 zeros between symbols.
+Code: upsampled = np.zeros(len(symbols)*L), upsampled[::L] = symbols
+3) Generate the SRRC pulse
+Time axis (in symbol periods): t = np.arange(-N_sym/2, N_sym/2 + 1/L, 1/L)
+At t = 0: p = 1 − β + 4β/π
+At |t| = 1/(4β): p = (β/√2)[(1 + 2/π) sin(π/4β) + (1 − 2/π) cos(π/4β)]
+Otherwise: p = [sin(πt(1−β)) + 4βt cos(πt(1+β))] / [πt(1 − (4βt)²)]
+If β = 0, use a tiny value (1e-8) to avoid division by zero.
+4) Pulse-shape the signal (transmitter)
+Logic: convolve the upsampled symbols with the pulse.
+Code: s_tx = np.convolve(upsampled, p, mode='full')
+5) Pass through the AWGN channel
+Signal power: P_s = np.mean(s_tx**2)
+Noise: noise = np.sqrt(P_s/snr_lin) * np.random.randn(len(s_tx)), and r_rx = s_tx + noise.
+6) Matched filter (receiver)
+Logic: the matched filter is the time-reversed pulse.
+Code: g = p[::-1], y_mf = np.convolve(r_rx, g, mode='full')
+7) Sample at the symbol instants
+Delay of the two filters: total_delay = 2*delta, where delta = (len(p) - 1)//2
+Code: y_sampled = y_mf[total_delay::L][:N_bits]
+8) Detect the bits
+detected_bits = np.where(y_sampled >= 0, 0, 1)
+9) Evaluate performance
+BER = np.sum(bits != detected_bits)/N_bits
+Repeat for SNR = 0 to 14 dB, and for β = 0, 0.25, 0.5, 1.
+Plot the bits, upsampled signal, SRRC pulse, transmitted signal, received signal, matched filter output, sampled symbols, detected bits, BER vs. β, and BER vs. SNR.
+Expected result: The matched filter output is sampled at the symbol instants with no ISI, so BER falls with increasing SNR. A larger β gives a wider pulse in frequency and a shorter one in time

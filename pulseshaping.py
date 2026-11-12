@@ -215,3 +215,4 @@ BER = np.sum(bits != detected_bits)/N_bits
 Repeat for SNR = 0 to 14 dB, and for β = 0, 0.25, 0.5, 1.
 Plot the bits, upsampled signal, SRRC pulse, transmitted signal, received signal, matched filter output, sampled symbols, detected bits, BER vs. β, and BER vs. SNR.
 Expected result: The matched filter output is sampled at the symbol instants with no ISI, so BER falls with increasing SNR. A larger β gives a wider pulse in frequency and a shorter one in time
+"""

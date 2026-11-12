@@ -123,3 +123,38 @@ axs[2].legend()
 
 plt.tight_layout()
 plt.show()
+
+
+"""
+1) Generate the random bits and group them in pairs
+Code: bits = np.random.randint(0, 2, N_bits), bit_pairs = bits.reshape(-1, 2)
+Parameters: N_bits = 200000, Eb = 1, Eb/N0 from −2 to 10 dB.
+2) Map each bit pair to a QPSK symbol (Gray mapping)
+Logic: each pair picks one quadrant.
+00 → (1 + j)√Eb
+01 → (−1 + j)√Eb
+11 → (−1 − j)√Eb
+10 → (1 − j)√Eb
+Plot the ideal constellation: four points, one per quadrant.
+3) Add AWGN noise (for each Eb/N0 value)
+snr_lin = 10**(snr_db/10), N0 = Eb/snr_lin, sigma = sqrt(N0/2)
+Code: y = s + sigma*(np.random.randn(N_symbols) + 1j*np.random.randn(N_symbols))
+The noise is independent on the I and Q axes.
+4) Detect by quadrant (decision regions)
+Logic: look at the signs of the real and imaginary parts.
+re ≥ 0, im ≥ 0 → 00
+re < 0, im ≥ 0 → 01
+re < 0, im < 0 → 11
+re ≥ 0, im < 0 → 10
+Write the two detected bits back into detected_bits[2*i : 2*i+2].
+5) Compute the simulated BER
+BER = np.sum(bits != detected_bits)/N_bits
+6) Compute the theoretical BER
+Pb = 0.5 * erfc(np.sqrt(Eb/N0))
+With Gray mapping, QPSK has the same BER as BPSK at the same Eb/N0.
+7) Plot the results
+Plot the received constellation at 5 dB, with the ideal points marked with ×.
+Plot BER vs. Eb/N0 on a log y-axis, simulated against theoretical.
+
+Expected result: Four noisy clusters appear, one per quadrant. The BER curve matches theory and is the same as BPSK, but QPSK sends 2 bits per symbol.
+"""
